@@ -8,6 +8,8 @@ function fetchData(apiUrl) {
         data = response.data;
         formatChartA();
         formatChartB();
+        formatChartC();
+        formatChartD();
     })
     .catch(error=>{
         console.log(error.name);
@@ -72,7 +74,7 @@ function renderChartA(data){
             y: {
                 max: 9, // 設定 Y 軸的最大值（可選）
                 label: {
-                    text: "平均分數 (1-10)",
+                    text: "平均滿意度 (1-10)",
                     position: "outer-top" // 可選：'inner-top', 'outer-top', 'inner-middle', 'outer-middle'
                 }
             }
@@ -142,11 +144,79 @@ function renderChartB(dataA, dataB){
             y: {
                 max: 9, // 設定 Y 軸的最大值（可選）
                 label: {
-                    text: "平均分數 (1-10)",
+                    text: "平均滿意度 (1-10)",
                     position: "outer-top" // 可選：'inner-top', 'outer-top', 'inner-middle', 'outer-middle'
                 }
             }
         }
     });
 
+}
+
+//圓餅圖：撈取男性跟女性比例有多少
+function formatChartC(){
+    let maleNum = 0;
+    let femaleNum = 0;
+    data.forEach(function(item){
+        if (item.gender == "男性"){            
+            maleNum ++;
+        } else if (item.gender =="女性"){
+            femaleNum ++;
+        }
+    })
+    renderChartC(maleNum, femaleNum);
+}
+function renderChartC(data1, data2){
+    const chart = c3.generate({
+        bindto: "#chartC",
+        data: {
+            columns: [
+                ['男性', data1], // 定義 X 軸的分類名稱
+                ['女性', data2]   // 定義每個分類對應的數據
+            ],
+            type: 'pie', // 設定圖表類型為直條圖
+            colors: {
+                '男性': '#7d99f0',
+                '女性': '#d97bb7'
+            },
+            labels: true // 啟用數值標籤
+        },
+        
+        size: {
+            width: 350
+        }
+    });
+}
+
+
+//圓餅圖：顯示薪水區間分佈
+function formatChartD(){
+    let obj = {};
+    data.forEach((item) => {
+        if (!obj[item.company.salary]) {
+            obj[item.company.salary] = 1;
+        } else if (obj[item.company.salary]) {
+            obj[item.company.salary] ++;
+        }
+    })
+
+    const ary = Object.entries(obj);
+    console.log(obj,ary);
+    renderChartD(ary);
+    
+}
+function renderChartD(ary){
+    const chart = c3.generate({
+        bindto: "#chartD",
+        data: {
+            columns: ary,
+            type: 'pie', // 設定圖表類型為直條圖
+            
+            labels: true // 啟用數值標籤
+        },
+        
+        size: {
+            width: 350
+        }
+    });
 }
